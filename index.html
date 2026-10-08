@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MysticDocs</title>
+<style>
+    * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
+  body { margin: 0; background: #f7f5ff; } /* light purple background */
+  header { background: #6a4dff; color: white; padding: 8px 16px; display: flex; gap: 10px; align-items: center; } /* Mystic Purple */
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+.toolbar { background: white; padding: 8px; border-bottom: 1px solid #ddd; display: flex; gap: 8px; flex-wrap: wrap; }
+.toolbar button { padding: 6px 12px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-size: 14px; }
+.toolbar button:hover { background: #f0ebff; border-color: #6a4dff; } /* purple hover */
+  #editor {
+    width: 90%; max-width: 850px; margin: 20px auto; background: white;
+    min-height: 70vh; padding: 40px; box-shadow: 0 0 10px rgba(106,77,255,0.15);
+    outline: none; line-height: 1.6; font-size: 16px; border-radius: 4px;
+  }
+.popup {
+    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: white; padding: 20px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 10;
+  }
+.popup h2 { margin-top: 0; font-size: 18px; color: #6a4dff; } /* purple title */
+.popup button { margin: 5px; padding: 8px 16px; border: 1px solid #6a4dff; background: #6a4dff; color: white; border-radius: 4px; cursor: pointer; }
+.popup button:hover { background: #5840d6; }
+  #overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index: 9; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔮 MysticDocs</h1>
+</header>
+
+<div class="toolbar">
+  <button onclick="document.execCommand('bold')"><b>B</b> Bold</button>
+  <button onclick="document.execCommand('italic')"><i>I</i> Italic</button>
+  <button onclick="document.execCommand('underline')"><u>U</u> Underline</button>
+  <button onclick="saveLocal()">💾 Save</button>
+  <button onclick="showSaveAs()">📥 Save As</button>
+</div>
+
+<div id="editor" contenteditable="true">
+  <h2>Welcome to MysticDocs!</h2>
+  <p>Start typing here. It's like Word, but made simple and magical.</p>
+</div>
+
+<div id="overlay" onclick="closePopup()"></div>
+<div class="popup" id="savePopup">
+  <h2>Save Your Magic</h2>
+  <p>Pick what kind of file you want:</p>
+  <button onclick="downloadFile('docx')">Word File.docx</button>
+  <button onclick="downloadFile('txt')">Text File.txt</button>
+  <button onclick="downloadFile('sdocx')">Samsung Doc.sdocx</button>
+  <br><br>
+  <button style="background:#ccc; color:#333; border-color:#ccc;" onclick="closePopup()">Cancel</button>
+</div>
+
+<script>
+// Auto-save to browser
+function saveLocal() {
+  localStorage.setItem('mysticdocs', document.getElementById('editor').innerHTML);
+  alert('Saved! Your magic is stored in your browser.');
+}
+
+// Load saved work when page opens
+window.onload = function() {
+  const saved = localStorage.getItem('mysticdocs');
+  if (saved) document.getElementById('editor').innerHTML = saved;
+}
+
+function showSaveAs() {
+  document.getElementById('overlay').style.display = 'block';
+  document.getElementById('savePopup').style.display = 'block';
+}
+
+function closePopup() {
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('savePopup').style.display = 'none';
+}
+
+function downloadFile(format) {
+  const content = document.getElementById('editor').innerText;
+  const htmlContent = document.getElementById('editor').innerHTML;
+  let blob, filename;
+
+  if (format === 'txt') {
+    blob = new Blob([content], {type: 'text/plain'});
+    filename = 'MysticDocs.txt';
+  }
+  else if (format === 'docx') {
+    const header = `<html><head><meta charset='UTF-8'></head><body>`;
+    const footer = `</body></html>`;
+    blob = new Blob([header + htmlContent + footer], {type: 'application/msword'});
+    filename = 'MysticDocs.docx';
+  }
+  else if (format === 'sdocx') {
+    const sdoc = { app: "MysticDocs", version: "1.0", content: htmlContent };
+    blob = new Blob([JSON.stringify(sdoc)], {type: 'application/json'});
+    filename = 'MysticDocs.sdocx';
+  }
+
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  closePopup();
+}
+</script>
+
+</body>
+</html>
