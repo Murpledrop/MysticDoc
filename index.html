@@ -7,145 +7,177 @@
 <style>
     * { box-sizing: border-box; font-family: "Segoe UI", Arial, sans-serif; }
   body { margin: 0; background: #f7f5ff; }
-  header { background: #6a4dff; color: white; padding: 10px 16px; display: flex; gap: 10px; align-items: center; }
-  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+ .hidden { display: none!important; }
 
+  /* HOME SCREEN */
+  #home { padding: 20px; max-width: 1000px; margin: 0 auto; }
+  #home header { text-align: center; padding: 20px 0; }
+  #home h1 { color: #6a4dff; font-size: 32px; margin: 0; }
+ .sidebar { position: fixed; left: 0; top: 0; width: 80px; height: 100%; background: #6a4dff; padding-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+ .sidebar button { background: none; border: none; color: white; font-size: 12px; cursor: pointer; text-align: center; }
+ .sidebar button span { font-size: 24px; display: block; }
+ .home-content { margin-left: 90px; }
+ .template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+ .template-card { background: white; border: 2px solid #ddd; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+ .template-card:hover { border-color: #6a4dff; transform: translateY(-2px); }
+ .template-card.icon { font-size: 48px; }
+ .recent-list { background: white; border-radius: 8px; padding: 15px; margin-top: 20px; }
+ .recent-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; display: flex; justify-content: space-between; }
+ .recent-item:hover { background: #f0ebff; }
+
+  /* EDITOR */
+  header { background: #6a4dff; color: white; padding: 10px 16px; display: flex; gap: 10px; align-items: center; }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; cursor: pointer; }
  .toolbar { background: white; padding: 10px; border-bottom: 1px solid #ddd; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
  .toolbar button,.toolbar select,.toolbar input { padding: 6px 10px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-size: 14px; }
  .toolbar button:hover { background: #f0ebff; border-color: #6a4dff; }
- .toolbar label { font-size: 13px; color: #555; }
+  #editor { width: 90%; max-width: 850px; margin: 20px auto; background: white; min-height: 70vh; padding: 40px; box-shadow: 0 0 10px rgba(106,77,255,0.15); outline: none; line-height: 1.6; font-size: 16px; border-radius: 4px; }
 
-  #editor {
-    width: 90%; max-width: 850px; margin: 20px auto; background: white;
-    min-height: 70vh; padding: 40px; box-shadow: 0 0 10px rgba(106,77,255,0.15);
-    outline: none; line-height: 1.6; font-size: 16px; border-radius: 4px;
-  }
-
-  /* Popups */
- .popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: white; padding: 20px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 10; text-align: center; }
+  /* POPUPS */
+ .popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); z-index: 10; text-align: center; }
  .popup h2 { margin-top: 0; font-size: 18px; color: #6a4dff; }
+ .popup input { padding: 8px; width: 90%; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
  .popup button { margin: 5px; padding: 8px 16px; border: 1px solid #6a4dff; background: #6a4dff; color: white; border-radius: 4px; cursor: pointer; }
- .popup button:hover { background: #5840d6; }
- .tip-popup { padding: 8px 12px; font-size: 13px; background: #333; color: white; border-radius: 4px; position: absolute; display: none; z-index: 20; }
   #overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.4); z-index: 9; }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>🔮 MysticDocs</h1>
-</header>
-
-<div class="toolbar">
-  <button onmouseover="showTip(event, 'Make letters BOLD')" onmouseout="hideTip()" onclick="document.execCommand('bold')"><b>B</b></button>
-  <button onmouseover="showTip(event, 'Make letters slanted')" onmouseout="hideTip()" onclick="document.execCommand('italic')"><i>I</i></button>
-  <button onmouseover="showTip(event, 'Draw line under text')" onmouseout="hideTip()" onclick="document.execCommand('underline')"><u>U</u></button>
-
-  <label>Font:</label>
-  <select onchange="document.execCommand('fontName', false, this.value)">
-    <option value="Arial">Arial</option>
-    <option value="Comic Sans MS">Comic Sans</option>
-    <option value="Verdana">Verdana</option>
-    <option value="Times New Roman">Times</option>
-  </select>
-
-  <label>Size:</label>
-  <select onchange="document.execCommand('fontSize', false, this.value)">
-    <option value="3">Normal</option>
-    <option value="4">Big</option>
-    <option value="5">Bigger</option>
-    <option value="6">Huge</option>
-    <option value="2">Small</option>
-  </select>
-
-  <label>Color:</label>
-  <input type="color" value="#6a4dff" onchange="document.execCommand('foreColor', false, this.value)" title="Pick text color">
-
-  <button onclick="saveLocal()">💾 Save</button>
-  <button onclick="showSaveAs()">📥 Save As</button>
+<!-- HOME SCREEN -->
+<div id="home">
+  <div class="sidebar">
+    <button onclick="newDoc()"><span>➕</span>New</button>
+    <button onclick="showRecent()"><span>🕒</span>Recent</button>
+    <button onclick="loadFile()"><span>📂</span>Open</button>
+    <input type="file" id="fileInput" class="hidden" accept=".sdocx,.txt,.docx" onchange="handleFile(event)">
+  </div>
+  <div class="home-content">
+    <header><h1>🔮 MysticDocs</h1></header>
+    <h2>New</h2>
+    <div class="template-grid">
+      <div class="template-card" onclick="newDoc()">
+        <div class="icon">📄</div>
+        <div>Blank Document</div>
+      </div>
+    </div>
+    <div class="recent-list">
+      <h3>Recent</h3>
+      <div id="recentDocs">No recent docs yet</div>
+    </div>
+  </div>
 </div>
 
-<div id="editor" contenteditable="true">
-  <h2>Welcome to MysticDocs!</h2>
-  <p>Start typing here. Use the buttons above to change colors and fonts!</p>
+<!-- EDITOR SCREEN -->
+<div id="editorScreen" class="hidden">
+  <header>
+    <h1 onclick="goHome()">🔮 MysticDocs</h1>
+    <span id="docTitle">Untitled</span>
+  </header>
+  <div class="toolbar">
+    <button onclick="document.execCommand('bold')"><b>B</b></button>
+    <button onclick="document.execCommand('italic')"><i>I</i></button>
+    <button onclick="document.execCommand('underline')"><u>U</u></button>
+    <select onchange="document.execCommand('fontName', false, this.value)">
+      <option>Arial</option><option>Comic Sans MS</option><option>Verdana</option>
+    </select>
+    <select onchange="document.execCommand('fontSize', false, this.value)">
+      <option value="3">Normal</option><option value="4">Big</option><option value="5">Bigger</option>
+    </select>
+    <input type="color" onchange="document.execCommand('foreColor', false, this.value)">
+    <button onclick="saveLocal()">💾 Save</button>
+    <button onclick="showRename()">✏️ Rename</button>
+    <button onclick="showSaveAs()">📥 Save As</button>
+  </div>
+  <div id="editor" contenteditable="true"></div>
 </div>
 
-<div class="tip-popup" id="tip"></div>
+<!-- POPUPS -->
 <div id="overlay" onclick="closePopup()"></div>
-
 <div class="popup" id="savePopup">
   <h2>Save Your Magic</h2>
-  <p>Pick what kind of file you want:</p>
-  <button onclick="downloadFile('docx')">Word File.docx</button>
-  <button onclick="downloadFile('txt')">Text File.txt</button>
-  <button onclick="downloadFile('sdocx')">Samsung Doc.sdocx</button>
-  <br><br>
-  <button style="background:#ccc; color:#333; border-color:#ccc;" onclick="closePopup()">Cancel</button>
+  <button onclick="downloadFile('docx')">Word.docx</button>
+  <button onclick="downloadFile('txt')">Text.txt</button>
+  <button onclick="downloadFile('sdocx')">MysticDocs.sdocx</button>
+  <br><br><button style="background:#ccc; color:#333;" onclick="closePopup()">Cancel</button>
+</div>
+<div class="popup" id="renamePopup">
+  <h2>Rename Document</h2>
+  <input type="text" id="renameInput" placeholder="My Magic Doc">
+  <br><button onclick="renameDoc()">Save Name</button>
+  <button style="background:#ccc; color:#333;" onclick="closePopup()">Cancel</button>
 </div>
 
 <script>
-// Auto-save to browser
-function saveLocal() {
-  localStorage.setItem('mysticdocs', document.getElementById('editor').innerHTML);
-  alert('Saved! Your magic is stored in your browser.');
+let currentDoc = { name: "Untitled", content: "" };
+
+// HOME / NAV
+function goHome() { document.getElementById('home').classList.remove('hidden'); document.getElementById('editorScreen').classList.add('hidden'); showRecent(); }
+function newDoc() { currentDoc = { name: "Untitled", content: "<h2>Welcome to MysticDocs!</h2><p>Start typing...</p>" }; openEditor(); }
+function openEditor() { document.getElementById('home').classList.add('hidden'); document.getElementById('editorScreen').classList.remove('hidden'); document.getElementById('editor').innerHTML = currentDoc.content; document.getElementById('docTitle').innerText = currentDoc.name; }
+
+// RECENT
+function saveToRecent() {
+  let recents = JSON.parse(localStorage.getItem('mystic_recent') || '[]');
+  recents = recents.filter(d => d.name!== currentDoc.name);
+  recents.unshift({ name: currentDoc.name, content: currentDoc.content, time: Date.now() });
+  recents = recents.slice(0, 5);
+  localStorage.setItem('mystic_recent', JSON.stringify(recents));
+}
+function showRecent() {
+  let recents = JSON.parse(localStorage.getItem('mystic_recent') || '[]');
+  const div = document.getElementById('recentDocs');
+  if (recents.length === 0) { div.innerHTML = "No recent docs yet"; return; }
+  div.innerHTML = recents.map(d => `<div class="recent-item" onclick="loadRecent('${d.name}')">${d.name}</div>`).join('');
+}
+function loadRecent(name) {
+  let recents = JSON.parse(localStorage.getItem('mystic_recent') || '[]');
+  currentDoc = recents.find(d => d.name === name);
+  openEditor();
 }
 
-// Load saved work when page opens
-window.onload = function() {
-  const saved = localStorage.getItem('mysticdocs');
-  if (saved) document.getElementById('editor').innerHTML = saved;
+// LOAD FILE
+function loadFile() { document.getElementById('fileInput').click(); }
+function handleFile(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    if (file.name.endsWith('.sdocx')) {
+      const data = JSON.parse(e.target.result);
+      currentDoc = { name: file.name.replace('.sdocx',''), content: data.content };
+    } else {
+      currentDoc = { name: file.name, content: e.target.result };
+    }
+    openEditor();
+  };
+  reader.readAsText(file);
 }
 
-function showSaveAs() {
-  document.getElementById('overlay').style.display = 'block';
-  document.getElementById('savePopup').style.display = 'block';
-}
-
-function closePopup() {
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('savePopup').style.display = 'none';
-}
-
-// NEW: Popup tips instead of text on buttons
-function showTip(event, text) {
-  const tip = document.getElementById('tip');
-  tip.innerText = text;
-  tip.style.display = 'block';
-  tip.style.left = event.pageX + 10 + 'px';
-  tip.style.top = event.pageY + 10 + 'px';
-}
-function hideTip() {
-  document.getElementById('tip').style.display = 'none';
-}
+// SAVE / RENAME / DOWNLOAD
+function saveLocal() { currentDoc.content = document.getElementById('editor').innerHTML; saveToRecent(); alert('Saved to Recent!'); }
+function showRename() { document.getElementById('overlay').style.display = 'block'; document.getElementById('renamePopup').style.display = 'block'; document.getElementById('renameInput').value = currentDoc.name; }
+function renameDoc() { currentDoc.name = document.getElementById('renameInput').value || "Untitled"; document.getElementById('docTitle').innerText = currentDoc.name; closePopup(); saveToRecent(); }
+function showSaveAs() { document.getElementById('overlay').style.display = 'block'; document.getElementById('savePopup').style.display = 'block'; }
+function closePopup() { document.getElementById('overlay').style.display = 'none'; document.getElementById('savePopup').style.display = 'none'; document.getElementById('renamePopup').style.display = 'none'; }
 
 function downloadFile(format) {
-  const content = document.getElementById('editor').innerText;
-  const htmlContent = document.getElementById('editor').innerHTML;
+  currentDoc.content = document.getElementById('editor').innerHTML;
   let blob, filename;
-
-  if (format === 'txt') {
-    blob = new Blob([content], {type: 'text/plain'});
-    filename = 'MysticDocs.txt';
-  }
-  else if (format === 'docx') {
-    const header = `<html><head><meta charset='UTF-8'></head><body>`;
-    const footer = `</body></html>`;
-    blob = new Blob([header + htmlContent + footer], {type: 'application/msword'});
-    filename = 'MysticDocs.docx';
-  }
+  if (format === 'txt') { blob = new Blob([document.getElementById('editor').innerText], {type: 'text/plain'}); filename = currentDoc.name + '.txt'; }
+  else if (format === 'docx') { blob = new Blob([`<html><body>${currentDoc.content}</body></html>`], {type: 'application/msword'}); filename = currentDoc.name + '.docx'; }
   else if (format === 'sdocx') {
-    const sdoc = { app: "MysticDocs", version: "2.0", content: htmlContent };
-    blob = new Blob([JSON.stringify(sdoc)], {type: 'application/json'});
-    filename = 'MysticDocs.sdocx';
+    const sdoc = { app: "MysticDocs", version: "3.0", content: currentDoc.content };
+    blob = new Blob([JSON.stringify(sdoc)], {type: 'text/plain'}); // text/plain stops.json
+    filename = currentDoc.name + '.sdocx';
   }
-
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = filename;
+  link.download = filename; // forces correct name
   link.click();
+  saveToRecent();
   closePopup();
 }
+
+goHome(); // start on home screen
 </script>
 
 </body>
